@@ -13,59 +13,49 @@ st.set_page_config(
 st.title("cloud Vayu")
 st.subheader("Real-time Weather Dashboard")
 
-# Initialize session state
+# Session state to store selected city
 if "selected_city" not in st.session_state:
     st.session_state.selected_city = ""
-if "show_weather" not in st.session_state:
-    st.session_state.show_weather = False
 
-# Search input
+# Search input with autocomplete
 search_query = st.text_input(
     "Search for a city:",
     placeholder="Type city name (e.g., Mumbai, Lon, New York)",
     key="search_input"
 )
 
-# Reset weather when new search starts
-if search_query != st.session_state.get("last_search", ""):
-    st.session_state.show_weather = False
-    st.session_state.last_search = search_query
-
-# Show autocomplete only if typing 2+ chars
+# Show suggestions only if typing
 if search_query and len(search_query) >= 2:
     with st.spinner("Searching cities..."):
-        suggestions = search_cities(search_query, limit=6)
-
+        suggestions = search_cities(search_query)
+    
     if suggestions:
         city_names = [s["name"] for s in suggestions]
         selected = st.selectbox(
-            "Select a city:",
-            options=[""] + city_names,  # Add empty option at top
-            index=0,
-            format_func=lambda x: "↓ Choose from suggestions" if x == "" else x,
+            "Did you mean:",
+            options=city_names,
+            index=None,
+            placeholder="Select a city from suggestions",
             key="city_select"
         )
-
-        # Only trigger weather when user selects a real city
-        if selected and selected != "":
+        if selected:
             st.session_state.selected_city = selected
-            st.session_state.show_weather = True
             st.success(f"Selected: **{selected}**")
     else:
         st.warning("No cities found. Try another name.")
-        st.session_state.show_weather = False
 else:
-    st.session_state.show_weather = False
+    st.session_state.selected_city = ""
 
-# === ONLY SHOW WEATHER IF USER SELECTED A CITY FROM DROPDOWN ===
-if st.session_state.show_weather and st.session_state.selected_city:
-    city_to_fetch = st.session_state.selected_city
+# Use selected city or fallback to manual input
+final_city = st.session_state.selected_city or search_query
 
-    with st.spinner(f"Fetching weather for **{city_to_fetch}**..."):
-        weather_data = get_current_weather(city_to_fetch)
+# Fetch weather if city is valid
+if final_city and len(final_city) >= 2:
+    with st.spinner(f"Fetching weather for **{final_city}**..."):
+        weather_data = get_current_weather(final_city)
 
     if weather_data and "error" not in weather_data:
-        # Success - Display weather
+        # Success Display
         col1, col2 = st.columns([1, 3])
         with col1:
             st.image(weather_data["icon"], width=120)
@@ -96,20 +86,11 @@ if st.session_state.show_weather and st.session_state.selected_city:
 
     elif weather_data and "error" in weather_data:
         st.error(f"Error: {weather_data['error']}")
-        st.session_state.show_weather = False
     else:
-        st.warning("No data received.")
-        st.session_state.show_weather = False
+        st.warning("No data. Please try a valid city.")
 
 else:
-    st.info("Start typing a city name → Select from dropdown to see weather!")
-
-# Clear button
-if st.session_state.show_weather:
-    if st.button("Clear Search"):
-        st.session_state.selected_city = ""
-        st.session_state.show_weather = False
-        st.rerun()
+    st.info("Start typing a city name to see suggestions!")
 
 # Footer
 st.markdown("---")

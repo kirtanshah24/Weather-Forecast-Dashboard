@@ -45,3 +45,36 @@ def get_current_weather(city: str):
         return {"error": f"Network error: {str(e)}"}
     except Exception as e:
         return {"error": f"Unexpected error: {str(e)}"}
+    
+def search_cities(query: str, limit: int = 5):
+    """
+    Search cities with autocomplete using WeatherAPI
+    Returns list of city suggestions
+    """
+    if not query.strip() or len(query.strip()) < 2:
+        return []
+
+    url = f"{BASE_URL}/search.json"
+    params = {
+        "key": API_KEY,
+        "q": query.strip()
+    }
+
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        if response.status_code == 200:
+            results = response.json()
+            # Return formatted list: "City, Region, Country"
+            return [
+                {
+                    "name": f"{r['name']}, {r.get('region', '')}, {r['country']}".strip(", "),
+                    "id": r["id"],
+                    "lat": r["lat"],
+                    "lon": r["lon"]
+                }
+                for r in results[:limit]
+            ]
+        else:
+            return []
+    except:
+        return []    
