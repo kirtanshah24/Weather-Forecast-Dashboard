@@ -75,7 +75,7 @@ if st.session_state.show_weather and st.session_state.selected_city:
             #### {weather_data['condition']}
             """)
 
-        # Metrics
+        # Metrics for weather
         m1, m2, m3 = st.columns(3)
         with m1:
             st.metric("Temperature", f"{weather_data['temp_c']}°C")
