@@ -113,4 +113,4 @@ if st.session_state.show_weather:
 
 # Footer
 st.markdown("---")
-st.caption("Built with love using Streamlit | Powered by WeatherAPI")
+st.caption("Built with love using Streamlit by Kirtan & Vraj | Powered by WeatherAPI")
