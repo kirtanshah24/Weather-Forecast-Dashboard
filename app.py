@@ -93,6 +93,7 @@ if st.session_state.show_weather and st.session_state.selected_city:
             #### {weather_data['condition']}
             """)
 
+        # Metrics for weather
         m1, m2, m3 = st.columns(3)
         with m1: st.metric("Temperature", f"{weather_data['temp_c']}°C")
         with m2: st.metric("Feels Like", f"{weather_data['feels_like_c']}°C")
@@ -128,4 +129,4 @@ else:
 
 # === FOOTER ===
 st.markdown("---")
-st.caption("Built with ❤️ using Streamlit | Powered by WeatherAPI")
+st.caption("Built with love using Streamlit | Powered by WeatherAPI")
