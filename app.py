@@ -10,7 +10,7 @@ st.set_page_config(
 # PORT : 8501
 
 # App title
-st.title("☁️ Vayu")
+st.title("☁️ Vayu the Weather App")
 st.subheader("Real-time Weather Dashboard")
 
 # Simple welcome
